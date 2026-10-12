@@ -1,0 +1,2 @@
+service_date,gtfs_file,route_type,active_rail_services,scheduled_rail_trips,rail_arrivals,scheduled_intervals
+2026-10-13,data/google-transit.zip,2 (rail),13,623,7759,7632

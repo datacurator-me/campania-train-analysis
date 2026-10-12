@@ -2,9 +2,9 @@
 
 ## Project Overview
 
-This project analyzes public transport timetable data to explore scheduled train service intervals in Campania, Italy, using R.
+This project analyzes scheduled rail-arrival intervals in EAV's Campania GTFS feed using R. The feed also contains bus services; the analysis filters those out.
 
-The goal is to identify stations and routes with longer gaps between scheduled train arrivals and communicate the results through statistical summaries and visualizations.
+The goal is to describe the spacing between scheduled train arrivals at each stop on a selected service date.
 
 This project is part of my Data Science portfolio and demonstrates data cleaning, exploratory data analysis, statistical analysis, data visualization, and reproducible research using R.
 
@@ -12,12 +12,11 @@ This project is part of my Data Science portfolio and demonstrates data cleaning
 
 * Which stations have the longest average scheduled intervals between trains?
 * How are scheduled train intervals distributed across stations?
-* How does scheduled service frequency vary between routes?
 * Which stations may deserve further investigation regarding service frequency?
 
 ## 📊 Dataset
 
-**Source:** [Wimob Google Transit Data](https://www.wimob.it/cfile/download.php?file=google-transit.zip)
+**Source:** [Wimob Google Transit Data](https://www.wimob.it/cfile/download.php?file=google-transit.zip), a GTFS feed that identifies EAV rail and bus routes.
 
 The dataset is expected to use the General Transit Feed Specification (GTFS), a standard format for public transport schedules.
 
@@ -27,9 +26,9 @@ Relevant files may include:
 * `stop_times.txt` — scheduled arrival and departure times
 * `trips.txt` — scheduled trips
 * `routes.txt` — route information
-* `calendar.txt` and `calendar_dates.txt` — service operating dates
+* `calendar.txt` and/or `calendar_dates.txt` — service operating dates
 
-**Important:** The dataset's geographic coverage, transport operators, licence, and validity dates must be verified before drawing conclusions specifically about Campania's regional trains.
+The analysis selects GTFS `route_type = 2` (rail) and only trips active on the chosen service date. Verify the feed's geographic coverage and licence before redistributing the source data or making broader claims about regional service.
 
 ## 🛠️ Tools and Technologies
 
@@ -45,18 +44,20 @@ Relevant files may include:
 ```text
 campania-train-analysis/
 ├── data/
-│   └── raw/
-│       └── README.md
+│   └── google-transit.zip
 ├── scripts/
 │   └── train_waiting_time.R
 ├── outputs/
+│   ├── scheduled_train_gaps.csv
+│   ├── station_summary.csv
+│   ├── run_metadata.csv
 │   ├── figures/
-│   └── README.md
+│   └── ...
 ├── .gitignore
 └── README.md
 ```
 
-The raw GTFS ZIP file is not included in the repository by default. Save it locally as `data/google-transit.zip` (or `data/raw/google-transit.zip` if you prefer that layout).
+The GTFS archive is stored at `data/google-transit.zip`. The script also accepts `data/raw/google-transit.zip` and `data/raw/eav_gtfs.zip`.
 
 ## ⚙️ Installation and Setup
 
@@ -72,13 +73,9 @@ Open R or the VS Code terminal and run:
 install.packages(c("readr", "dplyr", "ggplot2"))
 ```
 
-### 3. Download the dataset
+### 3. Dataset
 
-Download the [Google Transit ZIP file](https://www.wimob.it/cfile/download.php?file=google-transit.zip) and save it as:
-
-```text
-data/raw/google-transit.zip
-```
+The repository includes the feed at `data/google-transit.zip`. To use a refreshed copy, download the [Google Transit ZIP file](https://www.wimob.it/cfile/download.php?file=google-transit.zip) and replace it there, or save it at one of the alternate paths supported by the script.
 
 ### 4. Run the analysis
 
@@ -88,46 +85,43 @@ From the project root directory, run:
 Rscript scripts/train_waiting_time.R
 ```
 
-The script attempts to select a service date based on the feed's calendar files. You can optionally specify a date:
+By default, the script analyzes the current date. Set `SERVICE_DATE` to choose a different date covered by the feed:
 
 ```bash
 SERVICE_DATE=2026-10-13 Rscript scripts/train_waiting_time.R
 ```
 
-Use a date covered by the dataset's service calendar.
+If no rail service is active on that date, the script stops with an error rather than combining schedules from different days.
 
 ## 📈 Analysis and Outputs
 
 The script is designed to generate:
 
-* `scheduled_train_gaps.csv` — scheduled intervals between consecutive arrivals
-* `station_summary.csv` — station-level mean, median, 90th-percentile, and maximum intervals
-* `route_summary.csv` — route-level interval statistics
-* `run_metadata.csv` — basic information about the analysis run
+* `scheduled_train_gaps.csv` — intervals between consecutive scheduled rail arrivals at each stop
+* `station_summary.csv` — per-stop interval count, mean, median, 90th percentile, and maximum
+* `run_metadata.csv` — selected service date and counts of active services, trips, arrivals, and intervals
 
 Visualizations are saved in `outputs/figures/`:
 
-* `top_station_gaps.png` — stations with the highest mean scheduled intervals
-* `interval_distribution.png` — distribution of scheduled intervals
-* `top_route_gaps.png` — routes with the highest mean scheduled intervals
+* `top_station_gaps.png` — stops with the highest mean interval, limited to stops with at least five observed intervals
+* `interval_distribution.png` — distribution of scheduled intervals for the selected date
 
 These outputs will be available after the script runs successfully.
 
 ## 📐 Methodology
 
-1. Import the GTFS timetable files.
-2. Select trips operating on a valid service date when calendar information is available.
-3. Clean and transform scheduled arrival times.
-4. Calculate intervals between consecutive scheduled arrivals at each stop, route, and direction.
-5. Calculate descriptive statistics, including the mean, median, and 90th percentile.
-6. Generate charts to explore differences in scheduled service intervals.
-7. Export the results for further analysis.
+1. Import GTFS timetable, route, stop, and service-calendar files.
+2. Select rail trips active on the requested service date.
+3. Parse GTFS arrival times, including times after midnight represented as hour values greater than 24.
+4. Calculate intervals between consecutive arrivals at each stop for that service date.
+5. Calculate descriptive statistics and generate charts.
+6. Export the detailed intervals, station summaries, and run metadata.
 
-Intervals longer than 240 minutes are excluded from the current summary. This is an analytical choice that should be reviewed during exploratory data analysis.
+All non-negative intervals are retained; the previous 240-minute cutoff is no longer applied. Arrivals at the same scheduled time yield a zero-minute interval. Intervals are not wrapped from the last arrival of the selected service day to the first arrival of the next day.
 
 ## ⚠️ Limitations
 
-This project analyzes **scheduled service intervals**, not actual train delays.
+This project analyzes **scheduled service intervals**, not actual train delays or passenger waiting times. Results describe one service date at a time and can vary by date.
 
 GTFS timetable data alone cannot establish:
 
@@ -153,4 +147,4 @@ Created as a personal Data Science portfolio project to practice data analysis, 
 
 ## 📄 Data and Licensing
 
-The dataset is linked to its original source. Please verify the applicable licence and attribution requirements before redistributing the data or derived materials.
+The GTFS archive is sourced from [Wimob](https://www.wimob.it/cfile/download.php?file=google-transit.zip). Please verify the applicable licence and attribution requirements before redistributing the source data or derived materials.
