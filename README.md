@@ -1,4 +1,4 @@
-# 🚆 Campania Regional Train Analysis
+#  Campania Regional Train Analysis
 
 ## Project Overview
 
@@ -8,13 +8,13 @@ The goal is to describe the spacing between scheduled train arrivals at each sto
 
 This project is part of my Data Science portfolio and demonstrates data cleaning, exploratory data analysis, statistical analysis, data visualization, and reproducible research using R.
 
-## 🎯 Research Questions
+##  Research Questions
 
 * Which stations have the longest average scheduled intervals between trains?
 * How are scheduled train intervals distributed across stations?
 * Which stations may deserve further investigation regarding service frequency?
 
-## 📊 Dataset
+##  Dataset
 
 **Source:** [Wimob Google Transit Data](https://www.wimob.it/cfile/download.php?file=google-transit.zip), a GTFS feed that identifies EAV rail and bus routes.
 
@@ -30,7 +30,7 @@ Relevant files may include:
 
 The analysis selects GTFS `route_type = 2` (rail) and only trips active on the chosen service date. Verify the feed's geographic coverage and licence before redistributing the source data or making broader claims about regional service.
 
-## 🛠️ Tools and Technologies
+##  Tools and Technologies
 
 * **R** — data analysis
 * **readr** — data import and export
@@ -39,7 +39,7 @@ The analysis selects GTFS `route_type = 2` (rail) and only trips active on the c
 * **GTFS** — public transport timetable format
 * **Git and GitHub** — version control and project sharing
 
-## 📁 Project Structure
+##  Project Structure
 
 ```text
 campania-train-analysis/
@@ -59,7 +59,7 @@ campania-train-analysis/
 
 The GTFS archive is stored at `data/google-transit.zip`. The script also accepts `data/raw/google-transit.zip` and `data/raw/eav_gtfs.zip`.
 
-## ⚙️ Installation and Setup
+##  Installation and Setup
 
 ### 1. Install R
 
@@ -93,7 +93,7 @@ SERVICE_DATE=2026-10-13 Rscript scripts/train_waiting_time.R
 
 If no rail service is active on that date, the script stops with an error rather than combining schedules from different days.
 
-## 📈 Analysis and Outputs
+##  Analysis and Outputs
 
 The script is designed to generate:
 
@@ -108,7 +108,7 @@ Visualizations are saved in `outputs/figures/`:
 
 These outputs will be available after the script runs successfully.
 
-## 📐 Methodology
+##  Methodology
 
 1. Import GTFS timetable, route, stop, and service-calendar files.
 2. Select rail trips active on the requested service date.
@@ -119,7 +119,7 @@ These outputs will be available after the script runs successfully.
 
 All non-negative intervals are retained; the previous 240-minute cutoff is no longer applied. Arrivals at the same scheduled time yield a zero-minute interval. Intervals are not wrapped from the last arrival of the selected service day to the first arrival of the next day.
 
-## ⚠️ Limitations
+##  Limitations
 
 This project analyzes **scheduled service intervals**, not actual train delays or passenger waiting times. Results describe one service date at a time and can vary by date.
 
@@ -132,7 +132,7 @@ GTFS timetable data alone cannot establish:
 
 These questions require additional operational records, historical delay data, or passenger survey results.
 
-## 🚀 Future Improvements
+##  Future Improvements
 
 * Verify the feed's geographic and operator coverage.
 * Compare weekday and weekend service patterns.
@@ -141,10 +141,10 @@ These questions require additional operational records, historical delay data, o
 * Incorporate official historical delay and cancellation data, if available.
 * Compare timetable-based findings with passenger satisfaction survey results.
 
-## 👤 Author
+##  Author
 
 Created as a personal Data Science portfolio project to practice data analysis, statistical reasoning, visualization, and reproducible research using R.
 
-## 📄 Data and Licensing
+##  Data and Licensing
 
 The GTFS archive is sourced from [Wimob](https://www.wimob.it/cfile/download.php?file=google-transit.zip). Please verify the applicable licence and attribution requirements before redistributing the source data or derived materials.
